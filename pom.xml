@@ -1,0 +1,233 @@
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.1.RELEASE</version>
+        <relativePath/>
+    </parent>
+    <groupId>com.xyz</groupId>
+    <artifactId>springboot_template</artifactId>
+    <version>1.0.0</version>
+    <name>springboot_template</name>
+    <description>springboot_template</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <druid.version>1.1.12</druid.version>
+        <pagehelper.version>5.1.8</pagehelper.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- SpringBoot-MyBatis -->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>1.3.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- MySQL连接驱动 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <!--druid连接池 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+
+        <!-- 分页插件pagehelper -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+
+        <!-- xml -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+        </dependency>
+
+        <!-- hutool工具包 -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>4.6.3</version>
+        </dependency>
+
+        <!-- 阿里云短信 -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+
+        <!-- 支付宝支付 -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.7.12.ALL</version>
+        </dependency>
+
+        <!-- 测试 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <!-- 只打包mapper的xml配置文件，其他类型配置文件不打包，注释掉此段将打包所有配置文件-->
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+        <!-- 定义jar包名称，${project.name}代表<project>下的<name>的值，注释掉默认为<project>下的<name>-<version>的值 -->
+        <finalName>${project.name}</finalName>
+        <!--插件-->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <!-- 不打包资源文件，配置文件和jar包分开 -->
+                    <excludes>
+                        <exclude>**/*.properties</exclude>
+                        <exclude>**/mybatis-plugins.xml</exclude>
+                        <exclude>static/**</exclude>
+                        <exclude>templates/**</exclude>
+                    </excludes>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <!-- MANIFEST.MF中Class-Path加入前缀 -->
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <!-- jar包不包含唯一版本标识 -->
+                            <useUniqueVersions>false</useUniqueVersions>
+                            <!-- 指定入口类 -->
+                            <mainClass>com.xyz.SpringbootApplication</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <!--MANIFEST.MF中 Class-Path加入资源文件目录 -->
+                            <Class-Path>resources/</Class-Path>
+                        </manifestEntries>
+                    </archive>
+                    <!-- 指定资源文件输出目录 -->
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+            </plugin>
+            <!-- 复制依赖的jar包到指定的文件夹里 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib/</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 复制指定的文件 -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>**/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/resources</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- SpringBoot打包插件，把maven-jar-plugin打成的jar包重新打成可运行jar包 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!--重写包含依赖，包含不存在的依赖，jar里没有pom里的依赖 -->
+                    <includes>
+                        <include>
+                            <groupId>null</groupId>
+                            <artifactId>null</artifactId>
+                        </include>
+                    </includes>
+                    <layout>ZIP</layout>
+                    <!--使用外部配置文件，jar包里没有资源文件 -->
+                    <addResources>true</addResources>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <!-- 配置jar包特殊标识 配置后，保留原文件，生成新文件 *-run.jar -->
+                            <!-- 配置jar包特殊标识 不配置，原文件命名为 *.jar.original，生成新文件 *.jar -->
+                            <!-- <classifier>run</classifier> -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,56 @@
+server:
+  port: 9001
+  connection-timeout: 10s
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 1000
+    min-spare-threads: 30
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 2000MB
+      max-request-size: 3000MB
+  redis:
+    host: 121.196.220.122
+    port: 9527
+    timeout: 10000
+    password: APTX-4869
+    database: 0
+    jedis:
+      pool:
+        max-active: 50
+        max-idle: 30
+        min-idle: 5
+        max-wait: -1
+
+mysql:
+  datasource:
+    url: jdbc:mysql://rm-bp17e24r601qi1u9zio.mysql.rds.aliyuncs.com/tastytown?characterEncoding=utf-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: APTX-4869
+    driverClassName: com.mysql.cj.jdbc.Driver
+
+druid:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 100
+    minIdle: 30
+    maxActive: 100
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: false
+    maxPoolPreparedStatementPerConnectionSize: -1
+    filters: stat
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+
+pagehelper:
+  helper-dialect: mysql
+  params=count: countSql
+  reasonable: true
+  support-methods-arguments: true
