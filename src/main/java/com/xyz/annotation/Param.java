@@ -19,7 +19,7 @@ public @interface Param {
     // 参数类型
     ParamType type() default ParamType.PLAIN;
 
-    // 自定义二级规则（PLAIN时为正则/QUALIFIER时为限定值以,分隔/DATE为时间格式yMd）
+    // 自定义二级规则（ParamType为PLAIN时为正则，ParamType为QUALIFIER时为限定值（以,分隔），ParamType为DATE时为时间格式yMd）
     String rule() default "";
 
     // 发生错误后传给前端的提示语
@@ -38,13 +38,13 @@ public @interface Param {
         MOBILE(""),
 
         // 正整数
-        PINTEGER(""),
+        POSITIVE_INTEGER(""),
 
         // 时间，默认yyyy-MM-dd， 支持rule自定义
         DATE("yyyy-MM-dd"),
 
         // 邮箱
-        EMALL("");
+        EMAIL("");
 
         private final String value;
 

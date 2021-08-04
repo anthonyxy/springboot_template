@@ -42,9 +42,10 @@ public class ParamAspect {
     @Around("packet()")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        // 获取request response对象
+        // 获取request和response对象
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+
 
         Object[] args = joinPoint.getArgs();
 
@@ -58,11 +59,8 @@ public class ParamAspect {
             Param param = parameter.getAnnotation(Param.class);
             if (param != null) {
                 String arg = null == args[i] ? null : args[i].toString();
-                if (param.isRequired() && StrUtil.isEmpty(arg)) {
-                    // 非必传且前端没传，就检验下一个
-                    continue;
-                } else {
-                    if (arg == null) {// 必须传入而没有传
+                if (param.isRequired() || StrUtil.isNotEmpty(arg)) { // 非必传且前端没传，就跳过
+                    if (arg == null) { // 必传但没传
                         logger.warn(parameterNames[i] + "缺失");
                         if (param.warn().length() == 0) {
                             ResponseUtil.outWithJson(response, DataResult.build200(parameterNames[i] + "缺失"));
@@ -71,7 +69,7 @@ public class ParamAspect {
                         }
                         return null;
                     }
-                    if (!dataMarry(param, arg)) {
+                    if (!dataValidation(param, arg)) {
                         logger.warn(parameterNames[i] + "数据有误");
                         if (param.warn().length() == 0) {
                             ResponseUtil.outWithJson(response, DataResult.build200(parameterNames[i] + "数据有误"));
@@ -84,35 +82,31 @@ public class ParamAspect {
                 continue;// 如果有了@Param注解，就不检验@ObjectParam了
             }
 
-            ObjectParam oparam = parameter.getAnnotation(ObjectParam.class);
-            if (oparam != null) {
+            ObjectParam objectParam = parameter.getAnnotation(ObjectParam.class);
+            if (objectParam != null) {
                 Field[] field = parameter.getType().getDeclaredFields();
                 for (Field value : field) {
-                    Param fparam = value.getAnnotation(Param.class);
-                    if (fparam != null) {
-                        String farg = request.getParameter(value.getName());
-                        if (fparam.isRequired() || StrUtil.isEmpty(farg)) {
-                            // 非必传且前端没传，就检验下一个
-                            continue;
-                        } else {
-                            if (null == farg) {// 必须传入而没有传
+                    Param oParam = value.getAnnotation(Param.class);
+                    if (oParam != null) {
+                        String oName = request.getParameter(value.getName());
+                        if (oParam.isRequired() || StrUtil.isNotEmpty(oName)) { // 非必传且前端没传，就跳过
+                            if (null == oName) { // 必传但没传
                                 logger.warn(value.getName() + "缺失");
-                                if (fparam.warn().length() == 0) {
+                                if (oParam.warn().length() == 0) {
                                     ResponseUtil.outWithJson(response, DataResult.build200(value.getName() + "缺失"));
                                 } else {
-                                    ResponseUtil.outWithJson(response, DataResult.build250(fparam.warn()));
+                                    ResponseUtil.outWithJson(response, DataResult.build250(oParam.warn()));
                                 }
                                 return null;
                             }
-                            if (!dataMarry(fparam, farg)) {
+                            if (!dataValidation(oParam, oName)) {
                                 logger.warn(value.getName() + "数据有误");
-                                if (fparam.warn().length() == 0) {
+                                if (oParam.warn().length() == 0) {
                                     ResponseUtil.outWithJson(response,
                                             DataResult.build200(value.getName() + "数据有误"));
                                 } else {
-                                    ResponseUtil.outWithJson(response, DataResult.build250(fparam.warn()));
+                                    ResponseUtil.outWithJson(response, DataResult.build250(oParam.warn()));
                                 }
-
                                 return null;
                             }
                         }
@@ -125,10 +119,10 @@ public class ParamAspect {
 
     }
 
-    public static boolean dataMarry(Param param, String arg) {
+    private static boolean dataValidation(Param param, String arg) {
         if (param.type() == ParamType.MOBILE) {
             return ParamCheckUtil.isMobile(arg);
-        } else if (param.type() == ParamType.PINTEGER) {
+        } else if (param.type() == ParamType.POSITIVE_INTEGER) {
             return ParamCheckUtil.isPinteger(arg);
         } else if (param.type() == ParamType.DATE) {
             String regulation = ParamType.DATE.value();
@@ -136,7 +130,7 @@ public class ParamAspect {
                 regulation = param.rule();
             }
             return ParamCheckUtil.isFormatDate(arg, regulation);
-        } else if (param.type() == ParamType.EMALL) {
+        } else if (param.type() == ParamType.EMAIL) {
             return ParamCheckUtil.isEmall(arg);
         } else if (param.type() == ParamType.QUALIFIER) {
             return ParamCheckUtil.isInclude(arg, param.rule());
