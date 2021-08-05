@@ -78,7 +78,7 @@ public class LoginAspect {
         if (login.getType().equals(Type.PARAMID)) {
             String userId = request.getParameter(login.value());
             if (StrUtil.isEmpty(userId)) {
-                if (login.isRequisite()) {
+                if (login.isRequired()) {
                     logger.warn("用户登录权限接口没有传入userId参数");
                     ResponseUtil.outWithJson(response, DataResult.build300());
                     return null;
@@ -92,7 +92,7 @@ public class LoginAspect {
         } else if (login.getType().equals(Type.HEADTOKEN)) { // 从请求头中获取
             String token = request.getHeader(SystemConfig.HEAD_TOKEN);
             if (StrUtil.isEmpty(token)) {
-                if (login.isRequisite()) {
+                if (login.isRequired()) {
                     logger.warn("用户登录权限接口请求头中无token");
                     ResponseUtil.outWithJson(response, DataResult.build300());
                     return null;
@@ -100,7 +100,7 @@ public class LoginAspect {
             } else {
                 String info = redis.get(token);
                 if (StrUtil.isEmpty(info)) {
-                    if (login.isRequisite()) {
+                    if (login.isRequired()) {
                         logger.warn("用户登录权限接口请求头中的token不在redis");
                         ResponseUtil.outWithJson(response, DataResult.build400());
                         return null;

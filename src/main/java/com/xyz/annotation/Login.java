@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 public @interface Login {
 
     // 是否必须登录（必须登陆为true，可能登录为false，无须登录即不使用该注解）
-    boolean isRequisite() default true;
+    boolean isRequired() default true;
 
     // 允许角色访问的标志（多个以,分隔）
     String role() default "";
