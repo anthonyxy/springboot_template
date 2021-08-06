@@ -1,6 +1,6 @@
 package com.xyz.aop;
 
-import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import com.xyz.annotation.ObjectParam;
 import com.xyz.annotation.Param;
@@ -136,7 +136,7 @@ public class ParamAspect {
             return ParamCheckUtil.isInclude(arg, param.rule());
         } else if (param.type() == ParamType.PLAIN) {
             if (param.rule().length() > 0) {
-                return Validator.isMactchRegex(param.rule(), arg);
+                return ReUtil.isMatch(param.rule(), arg);
             }
         }
         return true;

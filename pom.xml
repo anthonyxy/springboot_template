@@ -9,10 +9,10 @@
         <relativePath/>
     </parent>
     <groupId>com.xyz</groupId>
-    <artifactId>springboot_template</artifactId>
+    <artifactId>77home</artifactId>
     <version>1.0.0</version>
-    <name>springboot_template</name>
-    <description>springboot_template</description>
+    <name>77home</name>
+    <description>77home</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,6 +38,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>2.0.0.RELEASE</version>
+        </dependency>
+
+        <!-- SpringBoot-Thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
         <!-- SpringBoot-MyBatis -->
@@ -83,7 +90,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>4.6.3</version>
+            <version>5.7.7</version>
         </dependency>
 
         <!-- 阿里云短信 -->
