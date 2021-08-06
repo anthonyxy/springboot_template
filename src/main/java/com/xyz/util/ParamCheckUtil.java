@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 public class ParamCheckUtil {
 
     public static boolean isMobile(String mobile) {
-        String regex = "^(((13[0-9])|(14[579])|(15([0-3]|[5-9]))|(16[6])|(17[0135678])|(18[0-9])|(19[89]))\\d{8})$";
+        String regex = "^1[3-9]\\d{9}$";
         return ReUtil.isMatch(regex, mobile);
     }
 
