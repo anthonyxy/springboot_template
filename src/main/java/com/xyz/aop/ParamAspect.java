@@ -63,18 +63,18 @@ public class ParamAspect {
                     if (arg == null) { // 必传但没传
                         logger.warn(parameterNames[i] + "缺失");
                         if (param.warn().length() == 0) {
-                            ResponseUtil.outWithJson(response, DataResult.build200(parameterNames[i] + "缺失"));
+                            ResponseUtil.outWithJson(response, DataResult.build9200(parameterNames[i] + "缺失"));
                         } else {
-                            ResponseUtil.outWithJson(response, DataResult.build250(param.warn()));
+                            ResponseUtil.outWithJson(response, DataResult.build9250(param.warn()));
                         }
                         return null;
                     }
                     if (!dataValidation(param, arg)) {
                         logger.warn(parameterNames[i] + "数据有误");
                         if (param.warn().length() == 0) {
-                            ResponseUtil.outWithJson(response, DataResult.build200(parameterNames[i] + "数据有误"));
+                            ResponseUtil.outWithJson(response, DataResult.build9200(parameterNames[i] + "数据有误"));
                         } else {
-                            ResponseUtil.outWithJson(response, DataResult.build250(param.warn()));
+                            ResponseUtil.outWithJson(response, DataResult.build9250(param.warn()));
                         }
                         return null;
                     }
@@ -93,9 +93,9 @@ public class ParamAspect {
                             if (null == oName) { // 必传但没传
                                 logger.warn(value.getName() + "缺失");
                                 if (oParam.warn().length() == 0) {
-                                    ResponseUtil.outWithJson(response, DataResult.build200(value.getName() + "缺失"));
+                                    ResponseUtil.outWithJson(response, DataResult.build9200(value.getName() + "缺失"));
                                 } else {
-                                    ResponseUtil.outWithJson(response, DataResult.build250(oParam.warn()));
+                                    ResponseUtil.outWithJson(response, DataResult.build9250(oParam.warn()));
                                 }
                                 return null;
                             }
@@ -103,9 +103,9 @@ public class ParamAspect {
                                 logger.warn(value.getName() + "数据有误");
                                 if (oParam.warn().length() == 0) {
                                     ResponseUtil.outWithJson(response,
-                                            DataResult.build200(value.getName() + "数据有误"));
+                                            DataResult.build9200(value.getName() + "数据有误"));
                                 } else {
-                                    ResponseUtil.outWithJson(response, DataResult.build250(oParam.warn()));
+                                    ResponseUtil.outWithJson(response, DataResult.build9250(oParam.warn()));
                                 }
                                 return null;
                             }

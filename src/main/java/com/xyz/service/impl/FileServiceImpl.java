@@ -27,7 +27,7 @@ public class FileServiceImpl implements FileService {
         fi.setFileUrl(path);
         fi.setFileData(bytes);
         fileInfoMapper.insert(fi);
-        return DataResult.build100(code);
+        return DataResult.build9100(code);
     }
 
     @Override

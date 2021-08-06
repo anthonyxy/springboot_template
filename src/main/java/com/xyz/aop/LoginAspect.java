@@ -80,13 +80,13 @@ public class LoginAspect {
             if (StrUtil.isEmpty(userId)) {
                 if (login.isRequired()) {
                     logger.warn("用户登录权限接口没有传入userId参数");
-                    ResponseUtil.outWithJson(response, DataResult.build300());
+                    ResponseUtil.outWithJson(response, DataResult.build9300());
                     return null;
                 }
             }
             if (!ParamCheckUtil.isPinteger(userId)) {
                 logger.warn("userId格式错误");
-                ResponseUtil.outWithJson(response, DataResult.build200("userId格式错误"));
+                ResponseUtil.outWithJson(response, DataResult.build9200("userId格式错误"));
                 return null;
             }
         } else if (login.getType().equals(Type.HEADTOKEN)) { // 从请求头中获取
@@ -94,7 +94,7 @@ public class LoginAspect {
             if (StrUtil.isEmpty(token)) {
                 if (login.isRequired()) {
                     logger.warn("用户登录权限接口请求头中无token");
-                    ResponseUtil.outWithJson(response, DataResult.build300());
+                    ResponseUtil.outWithJson(response, DataResult.build9300());
                     return null;
                 }
             } else {
@@ -102,7 +102,7 @@ public class LoginAspect {
                 if (StrUtil.isEmpty(info)) {
                     if (login.isRequired()) {
                         logger.warn("用户登录权限接口请求头中的token不在redis");
-                        ResponseUtil.outWithJson(response, DataResult.build400());
+                        ResponseUtil.outWithJson(response, DataResult.build9400());
                         return null;
                     }
                 } else {
