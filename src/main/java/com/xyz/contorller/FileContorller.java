@@ -67,7 +67,7 @@ public class FileContorller {
     @PostMapping("uploadFile")
     public DataResult uploadFile(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
-            return DataResult.build250("请选择上传文件");
+            return DataResult.build9250("请选择上传文件");
         }
         // 获取文件名
         String fileName = file.getOriginalFilename();
@@ -93,7 +93,7 @@ public class FileContorller {
             return fileService.saveFile(newpath.toString(), bytes);
         } catch (Exception e) {
             e.printStackTrace();
-            return DataResult.build500();
+            return DataResult.build9500();
         }
 
     }
