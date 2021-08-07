@@ -34,7 +34,7 @@ public class UserContorller {
             return userService.getCode(phoneNumber);
         } catch (Exception e) {
             logger.error("/user/getCode", e);
-            return DataResult.build500();
+            return DataResult.build9500();
         }
     }
 
@@ -51,7 +51,7 @@ public class UserContorller {
             return userService.login(phoneNumber, code);
         } catch (Exception e) {
             logger.error("/user/login", e);
-            return DataResult.build500();
+            return DataResult.build9500();
         }
     }
 
@@ -67,7 +67,7 @@ public class UserContorller {
             return userService.logout(userId);
         } catch (Exception e) {
             logger.error("/user/logout", e);
-            return DataResult.build500();
+            return DataResult.build9500();
         }
     }
 

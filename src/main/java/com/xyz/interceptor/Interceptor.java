@@ -45,7 +45,7 @@ public class Interceptor implements HandlerInterceptor {
             String timestamp = request.getParameter(SystemConfig.TIMESTAMP_KEY);
             String nonce = request.getParameter(SystemConfig.NONCE_KEY);
             if (StrUtil.isEmpty(sign) || StrUtil.isEmpty(timestamp) || StrUtil.isEmpty(nonce)) {
-                ResponseUtil.outWithJson(response, DataResult.build200("签名参数缺失"));
+                ResponseUtil.outWithJson(response, DataResult.build9200("签名参数缺失"));
                 comeOut();
                 return false;
             }
@@ -53,14 +53,14 @@ public class Interceptor implements HandlerInterceptor {
                 long nowTime = new Date().getTime();
                 long requestTime = Long.parseLong(timestamp);
                 if (nowTime - requestTime < SystemConfig.SIGN_PAST_TIME * 1000) {
-                    ResponseUtil.outWithJson(response, DataResult.build200("签名过期"));
+                    ResponseUtil.outWithJson(response, DataResult.build9200("签名过期"));
                     comeOut();
                     return false;
                 }
             }
             boolean flag = SignatureUtil.checkSignature(sign, timestamp, nonce);
             if (!flag) {
-                ResponseUtil.outWithJson(response, DataResult.build200("签名错误"));
+                ResponseUtil.outWithJson(response, DataResult.build9200("签名错误"));
                 comeOut();
                 return false;
             }
