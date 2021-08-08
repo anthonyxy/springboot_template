@@ -12,10 +12,10 @@ spring:
       max-file-size: 2000MB
       max-request-size: 3000MB
   redis:
-    host: 121.196.220.122
-    port: 9527
+    host:
+    port:
     timeout: 10000
-    password: APTX-4869
+    password:
     database: 0
     jedis:
       pool:
