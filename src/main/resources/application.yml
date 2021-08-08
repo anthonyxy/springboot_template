@@ -26,9 +26,9 @@ spring:
 
 mysql:
   datasource:
-    url: jdbc:mysql://rm-bp17e24r601qi1u9zio.mysql.rds.aliyuncs.com/tastytown?characterEncoding=utf-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-    username: root
-    password: APTX-4869
+    url: jdbc:mysql://
+    username:
+    password:
     driverClassName: com.mysql.cj.jdbc.Driver
 
 druid:
@@ -48,6 +48,10 @@ druid:
     maxPoolPreparedStatementPerConnectionSize: -1
     filters: stat
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+
+logging:
+  level:
+    com.xyz.entity.mapper: debug
 
 pagehelper:
   helper-dialect: mysql
