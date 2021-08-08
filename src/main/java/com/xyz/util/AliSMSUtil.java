@@ -45,7 +45,7 @@ public class AliSMSUtil {
     // 短信验证码有效期（秒）
     private static final int PERIOD_VALIDITY = 300;
     // 发送短信验证码隔离时间（秒）
-    private static final int ISOLATE_TIME = 60;
+    private static final int ISOLATE_TIME = 59;
 
     private boolean sendAliSMS(String phoneNumber, String VerificationCode, String operationType) {
         DefaultProfile profile = DefaultProfile.getProfile("default", ALI_ACCESS_KEY, ALI_ACCESS_KEY_SECRET);
@@ -125,6 +125,7 @@ public class AliSMSUtil {
         if (!isSuccess) {
             return "系统错误，请联系客服";
         }
+        // 保存到Redis
         SMSInfo newSMS = new SMSInfo();
         newSMS.setCode(code);
         newSMS.setIsUse(0);
@@ -141,7 +142,7 @@ public class AliSMSUtil {
         return "success";
     }
 
-    public String verifyCode(String phoneNumber, String verificationCode, int type) throws Exception {
+    public String verifyCode(String phoneNumber, String code, int type) throws Exception {
         String key = REDIS_MAKE + phoneNumber;
         SMSInfo SMS = redis.getObject(key, SMSInfo.class);
         if (null == SMS) {
@@ -157,7 +158,7 @@ public class AliSMSUtil {
         if (isTimeOut) {
             return "该验证码已过期，请重新获取";
         }
-        if (!verificationCode.equals(SMS.getCode())) {
+        if (!code.equals(SMS.getCode())) {
             return "验证不正确，请重新输入";
         }
         SMS.setIsUse(1);
