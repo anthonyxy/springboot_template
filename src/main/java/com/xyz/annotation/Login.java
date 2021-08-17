@@ -28,12 +28,12 @@ public @interface Login {
     int paramIndex() default 0;
 
     // 指明获取参数类型的方式
-    Type getType() default Type.HEADTOKEN;
+    Type getType() default Type.COOKIE;
 
     enum Type {
         HEADTOKEN, // 生成token放在请求头
         PARAMID, // 通过参数直传userId
-        COOKIE // 生成token放到cookie中（暂无）
+        COOKIE // 生成token放到cookie中
     }
 
 }

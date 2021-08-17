@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -91,46 +92,55 @@ public class LoginAspect {
             }
         } else if (login.getType().equals(Type.HEADTOKEN)) { // 从请求头中获取
             String token = request.getHeader(SystemConfig.HEAD_TOKEN);
-            if (StrUtil.isEmpty(token)) {
-                if (login.isRequired()) {
-                    logger.warn("用户登录权限接口请求头中无token");
-                    ResponseUtil.outWithJson(response, DataResult.build9300());
-                    return null;
-                }
-            } else {
-                String info = redis.get(token);
-                if (StrUtil.isEmpty(info)) {
-                    if (login.isRequired()) {
-                        logger.warn("用户登录权限接口请求头中的token不在redis");
-                        ResponseUtil.outWithJson(response, DataResult.build9400());
-                        return null;
-                    }
-                } else {
-                    redis.setOutTime(token, SystemConfig.LOGIN_OUT_TIME);
-                    // 如果使用Account对象接收可开启以下权限控制，本项目注入userId暂不使用
-                    // 这里取出登录时redis存的用户对象
-                    // Account acc = JSONUtil.toBean(info, Account.class);
-                    // 接口权限控制
-                    // if (login.role().length() > 0) {
-                    // if (login.role().indexOf(acc.getRole().toString()) == -1) {
-                    // logger.warn("登录用户访问了权限不足的接口");
-                    // ResponseUtil.outWithJson(response, DataResult.build250("权限不足"));
-                    // return null;
-                    // }
-                    // }
-                    // 使用id的话，注入进去
-                    if (login.isUse()) {
-                        Object[] args = joinPoint.getArgs();
-                        args[login.paramIndex()] = Long.parseLong(info);
-                        return joinPoint.proceed(args);
-                    }
-                }
-            }
-        } else { // 生成token放到cookie中（暂无）
-
+            verificationToken(token, login, response, joinPoint);
+        } else if (login.getType().equals(Type.COOKIE)) { // 从cookie的Value中获取
+            Cookie[] cookies = request.getCookies();
+            String token = cookies[0].getValue();
+            verificationToken(token, login, response, joinPoint);
         }
         return joinPoint.proceed();
     }
+
+
+    private Object verificationToken(String token, Login login, HttpServletResponse response, ProceedingJoinPoint joinPoint) throws Throwable {
+        if (StrUtil.isEmpty(token)) {
+            if (login.isRequired()) {
+                logger.warn("用户登录权限接口cookie中无token");
+                ResponseUtil.outWithJson(response, DataResult.build9300());
+                return null;
+            }
+        } else {
+            String info = redis.get(token);
+            if (StrUtil.isEmpty(info)) {
+                if (login.isRequired()) {
+                    logger.warn("用户登录权限接口请求头中的token不在redis");
+                    ResponseUtil.outWithJson(response, DataResult.build9400());
+                    return null;
+                }
+            } else {
+                redis.setOutTime(token, SystemConfig.LOGIN_OUT_TIME);
+                // 如果使用Account对象接收可开启以下权限控制，本项目注入userId暂不使用
+                // 这里取出登录时redis存的用户对象
+                // Account acc = JSONUtil.toBean(info, Account.class);
+                // 接口权限控制
+                // if (login.role().length() > 0) {
+                // if (login.role().indexOf(acc.getRole().toString()) == -1) {
+                // logger.warn("登录用户访问了权限不足的接口");
+                // ResponseUtil.outWithJson(response, DataResult.build250("权限不足"));
+                // return null;
+                // }
+                // }
+                // 使用id的话，注入进去
+                if (login.isUse()) {
+                    Object[] args = joinPoint.getArgs();
+                    args[login.paramIndex()] = Long.parseLong(info);
+                    return joinPoint.proceed(args);
+                }
+            }
+        }
+        return null;
+    }
+
 
     /*
      * 配置前置通知,使用在方法aspect()上注册的切入点 同时接受JoinPoint切入点对象,可以没有该参数
