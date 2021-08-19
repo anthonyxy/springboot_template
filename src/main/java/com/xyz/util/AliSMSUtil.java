@@ -1,6 +1,7 @@
 package com.xyz.util;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,18 +114,18 @@ public class AliSMSUtil {
             }
         }
         // 发送
-        boolean isSuccess = false;
-        switch (type) {
-            case 1:
-                isSuccess = sendAliSMS(phoneNumber, code, TEMPLATE_LOGIN);
-                break;
-            case 2:
-                isSuccess = sendAliSMS(phoneNumber, code, TEMPLATE_AUTHENTICATION);
-                break;
-        }
-        if (!isSuccess) {
-            return "系统错误，请联系客服";
-        }
+//        boolean isSuccess = false;
+//        switch (type) {
+//            case 1:
+//                isSuccess = sendAliSMS(phoneNumber, code, TEMPLATE_LOGIN);
+//                break;
+//            case 2:
+//                isSuccess = sendAliSMS(phoneNumber, code, TEMPLATE_AUTHENTICATION);
+//                break;
+//        }
+//        if (!isSuccess) {
+//            return "系统错误，请联系客服";
+//        }
         // 保存到Redis
         SMSInfo newSMS = new SMSInfo();
         newSMS.setCode(code);
@@ -137,8 +138,7 @@ public class AliSMSUtil {
             newSMS.setTotal(1);
         }
         newSMS.setType(type);
-        redis.setObject(key, newSMS);
-        redis.setOutTime(key, getDayEndDiffSecond());
+        redis.setObject(key, newSMS, getDayEndDiffSecond(), TimeUnit.SECONDS);
         return "success";
     }
 
@@ -162,8 +162,7 @@ public class AliSMSUtil {
             return "验证不正确，请重新输入";
         }
         SMS.setIsUse(1);
-        redis.setObject(key, SMS);
-        redis.setOutTime(key, getDayEndDiffSecond());
+        redis.setObject(key, SMS, getDayEndDiffSecond(), TimeUnit.SECONDS);
         return "success";
     }
 

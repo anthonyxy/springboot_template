@@ -3,8 +3,8 @@ package com.xyz.config;
 // 系统配置
 public class SystemConfig {
 
-    // 用户登录过期时间（秒）
-    public final static long LOGIN_OUT_TIME = 30 * 60 * 60 * 24;
+    // 用户登录过期时间（天）
+    public final static long LOGIN_OUT_TIME = 90;
 
     // 登录后用户身份请求头
     public final static String HEAD_TOKEN = "User-Token";

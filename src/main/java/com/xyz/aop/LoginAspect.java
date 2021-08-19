@@ -25,6 +25,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Login注解用户登录校验
@@ -94,8 +95,8 @@ public class LoginAspect {
             String token = request.getHeader(SystemConfig.HEAD_TOKEN);
             verificationToken(token, login, response, joinPoint);
         } else if (login.getType().equals(Type.COOKIE)) { // 从cookie的Value中获取
-            Cookie[] cookies = request.getCookies();
-            String token = cookies[0].getValue();
+            String cookie = request.getHeader("Cookie");
+            String token = cookie.split("=")[1];
             verificationToken(token, login, response, joinPoint);
         }
         return joinPoint.proceed();
@@ -118,7 +119,7 @@ public class LoginAspect {
                     return null;
                 }
             } else {
-                redis.setOutTime(token, SystemConfig.LOGIN_OUT_TIME);
+                redis.setOutTime(token, SystemConfig.LOGIN_OUT_TIME, TimeUnit.DAYS);
                 // 如果使用Account对象接收可开启以下权限控制，本项目注入userId暂不使用
                 // 这里取出登录时redis存的用户对象
                 // Account acc = JSONUtil.toBean(info, Account.class);
