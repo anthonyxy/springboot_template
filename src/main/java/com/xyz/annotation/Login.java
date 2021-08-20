@@ -24,7 +24,7 @@ public @interface Login {
     // 如果使用自动注入，接收id的参数的名
     String value() default "userId";
 
-    // 使用参数接收的位数
+    // 使用自动注入时LoginInfo接收的位数
     int paramIndex() default 0;
 
     // 指明获取参数类型的方式
