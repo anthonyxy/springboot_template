@@ -6,6 +6,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.crypto.SecureUtil;
+import com.xyz.util.dto.DataResult;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * 其他工具
@@ -39,6 +42,31 @@ public class AnthonyUtil {
         Comparator<Object> comparator = Collator.getInstance(java.util.Locale.CHINA);
         Arrays.sort(array, comparator);
         return Arrays.asList(array);
+    }
+
+    /**
+     * 混合加密
+     *
+     * @param str 原字符串
+     * @return String 加密后字符串
+     */
+    public static String mixedEncryption(String str) {
+        return SecureUtil.md5(SecureUtil.sha1("Z" + SecureUtil.md5("X" + str) + "Y"));
+    }
+
+    /**
+     * 同步登录验证
+     *
+     * @param LoginStatus 登录状态，0未登录，2登陆过期
+     * @return ModelAndView 未登录时设置viewName，登录时不设置viewName
+     */
+    public static ModelAndView createForSync(int LoginStatus) {
+        if (LoginStatus == 0) {
+            return new ModelAndView("/login");
+        } else if (LoginStatus == 2) {
+            return new ModelAndView("/login");
+        }
+        return new ModelAndView();
     }
 
 }

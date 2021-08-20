@@ -63,24 +63,24 @@ public class LoginAspect {
 
         // 获取注解配置
         Login login;
-        Login masterlogin = methodSignature.getMethod().getAnnotation(Login.class);
-        Login slavelogin = joinPoint.getTarget().getClass().getAnnotation(Login.class);
+        Login masterLogin = methodSignature.getMethod().getAnnotation(Login.class);
+        Login slaveLogin = joinPoint.getTarget().getClass().getAnnotation(Login.class);
         // 如果都没有login注解，就不需要检验
-        if (null == masterlogin && null == slavelogin) {
+        if (null == masterLogin && null == slaveLogin) {
             return joinPoint.proceed();
         }
         // 优先采用方法上的注解
-        if (null != masterlogin) {
-            login = masterlogin;
+        if (null != masterLogin) {
+            login = masterLogin;
         } else {
-            login = slavelogin;
+            login = slaveLogin;
         }
 
         // 获取request response对象
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
 
-        if (login.getType().equals(Type.PARAMID)) { // 从参数中直接获取
+        if (login.getType().equals(Type.PARAMID)) { // 从参数中直接获取（异步）
             String userId = request.getParameter(login.value());
             if (StrUtil.isEmpty(userId)) {
                 if (login.isRequired()) {
@@ -94,17 +94,17 @@ public class LoginAspect {
                 ResponseUtil.outWithJson(response, DataResult.build9200("userId格式错误"));
                 return null;
             }
-        } else if (login.getType().equals(Type.HEADTOKEN)) { // 从请求头中获取
+        } else if (login.getType().equals(Type.HEADTOKEN)) { // 从请求头中获取（异步）
             String token = request.getHeader(SystemConfig.HEAD_TOKEN);
             if (login.isRequired()) { // token为空但必须登陆
                 if (StrUtil.isEmpty(token)) { // token为空
-                    logger.warn("用户登录权限接口cookie中无token");
+                    logger.warn("用户登录权限接口Cookie中无token");
                     ResponseUtil.outWithJson(response, DataResult.build9300());
                     return null;
                 } else { // token不为空
                     String loginId = redis.get(token);
                     if (StrUtil.isEmpty(loginId)) { // token不为空但redis无
-                        logger.warn("用户登录权限接口请求头中的token不在redis");
+                        logger.warn("用户登录权限接口请求头中的token不在Redis");
                         ResponseUtil.outWithJson(response, DataResult.build9400());
                         return null;
                     } else {
@@ -131,7 +131,7 @@ public class LoginAspect {
                 }
             }
 
-        } else if (login.getType().equals(Type.COOKIE)) { // 从cookie的Value中获取
+        } else if (login.getType().equals(Type.COOKIE)) { // 从cookie的Value中获取（同步+异步）
             String token = null;
             String cookie = request.getHeader("Cookie");
             if (StrUtil.isNotBlank(cookie)) {
@@ -144,11 +144,11 @@ public class LoginAspect {
             int loginStatus = 0;
             if (login.isRequired()) { // token为空但必须登陆
                 if (StrUtil.isEmpty(token)) { // token为空
-                    logger.warn("用户登录权限接口cookie中无token");
+                    logger.warn("用户登录权限接口Cookie中无token");
                 } else {
                     loginId = redis.get(token);
                     if (StrUtil.isEmpty(loginId)) { // token不为空但redis无
-                        logger.warn("用户登录权限接口请cookie中的token不在redis");
+                        logger.warn("用户登录权限接口请Cookie中的token不在Redis");
                         loginStatus = 2;
                     } else {
                         redis.setOutTime(token, SystemConfig.LOGIN_OUT_TIME, TimeUnit.DAYS);
@@ -166,12 +166,22 @@ public class LoginAspect {
                 }
             }
             if (login.isUse()) {
-                Object[] args = joinPoint.getArgs();
+                if (StrUtil.isNotEmpty(request.getHeader("x-requested-with"))) { // 异步直接返回
+                    if (loginStatus == 0) {
+                        ResponseUtil.outWithJson(response, DataResult.build9300());
+                        return null;
+                    }
+                    if (loginStatus == 2) {
+                        ResponseUtil.outWithJson(response, DataResult.build9400());
+                        return null;
+                    }
+                }
                 LoginInfo li = new LoginInfo();
                 if (StrUtil.isNotEmpty(loginId)) {
                     li.setLoginId(Long.parseLong(loginId));
                 }
                 li.setLoginStatus(loginStatus);
+                Object[] args = joinPoint.getArgs();
                 args[login.paramIndex()] = li;
                 return joinPoint.proceed(args);
             }
