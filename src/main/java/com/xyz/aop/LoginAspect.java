@@ -102,27 +102,33 @@ public class LoginAspect {
                     ResponseUtil.outWithJson(response, DataResult.build9300());
                     return null;
                 } else { // token不为空
-                    String loginId = redis.get(token);
-                    if (StrUtil.isEmpty(loginId)) { // token不为空但redis无
+                    String tokenValue = redis.get(token);
+                    if (StrUtil.isEmpty(tokenValue)) { // token不为空但redis无
                         logger.warn("用户登录权限接口请求头中的token不在Redis");
                         ResponseUtil.outWithJson(response, DataResult.build9400());
                         return null;
                     } else {
                         redis.setOutTime(token, SystemConfig.LOGIN_OUT_TIME, TimeUnit.DAYS);
-                        // 如果使用Account对象接收可开启以下权限控制，本项目注入userId暂不使用
+                        // 注入Account，可开启以下权限控制
                         // Account account = JSONUtil.toBean(loginId, Account.class);
                         // if (login.role().length() > 0) {
-                        //     if (login.role().indexOf(acc.getRole().toString()) == -1) {
+                        //     if (login.role().indexOf(account.getRole().toString()) == -1) {
                         //         logger.warn("登录用户访问了权限不足的接口");
                         //         ResponseUtil.outWithJson(response, DataResult.build9250("权限不足"));
                         //         return null;
                         //     }
                         // }
-                        // 注入
+                        // if (login.isUse()) {
+                        //     Object[] args = joinPoint.getArgs();
+                        //     args[login.paramIndex()] = account;
+                        //     return joinPoint.proceed(args);
+                        // }
+                        // ==================================
+                        // 注入LoginInfo
                         if (login.isUse()) {
                             Object[] args = joinPoint.getArgs();
                             LoginInfo li = new LoginInfo();
-                            li.setLoginId(Long.parseLong(loginId));
+                            li.setLoginId(Long.parseLong(tokenValue));
                             li.setLoginStatus(1);
                             args[login.paramIndex()] = li;
                             return joinPoint.proceed(args);
@@ -131,7 +137,7 @@ public class LoginAspect {
                 }
             }
 
-        } else if (login.getType().equals(Type.COOKIE)) { // 从cookie的Value中获取（同步+异步）
+        } else if (login.getType().equals(Type.COOKIE)) { // 从cookie的Value中获取（同步+异步都有的项目使用）
             String token = null;
             String cookie = request.getHeader("Cookie");
             if (StrUtil.isNotBlank(cookie)) {
@@ -140,28 +146,19 @@ public class LoginAspect {
                     token = cookieTokens[1];
                 }
             }
-            String loginId = null;
+            String tokenValue = null;
             int loginStatus = 0;
             if (login.isRequired()) { // token为空但必须登陆
                 if (StrUtil.isEmpty(token)) { // token为空
                     logger.warn("用户登录权限接口Cookie中无token");
                 } else {
-                    loginId = redis.get(token);
-                    if (StrUtil.isEmpty(loginId)) { // token不为空但redis无
+                    tokenValue = redis.get(token);
+                    if (StrUtil.isEmpty(tokenValue)) { // token不为空但redis无
                         logger.warn("用户登录权限接口请Cookie中的token不在Redis");
                         loginStatus = 2;
                     } else {
                         redis.setOutTime(token, SystemConfig.LOGIN_OUT_TIME, TimeUnit.DAYS);
                         loginStatus = 1;
-                        // 如果使用Account对象接收可开启以下权限控制，本项目注入userId暂不使用
-                        // Account account = JSONUtil.toBean(loginId, Account.class);
-                        // if (login.role().length() > 0) {
-                        //     if (login.role().indexOf(acc.getRole().toString()) == -1) {
-                        //         logger.warn("登录用户访问了权限不足的接口");
-                        //         ResponseUtil.outWithJson(response, DataResult.build9250("权限不足"));
-                        //         return null;
-                        //     }
-                        // }
                     }
                 }
             }
@@ -177,8 +174,8 @@ public class LoginAspect {
                     }
                 }
                 LoginInfo li = new LoginInfo();
-                if (StrUtil.isNotEmpty(loginId)) {
-                    li.setLoginId(Long.parseLong(loginId));
+                if (StrUtil.isNotEmpty(tokenValue)) {
+                    li.setLoginId(Long.parseLong(tokenValue));
                 }
                 li.setLoginStatus(loginStatus);
                 Object[] args = joinPoint.getArgs();

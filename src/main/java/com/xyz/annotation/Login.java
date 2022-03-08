@@ -15,7 +15,7 @@ public @interface Login {
     // 是否必须登录（必须登陆为true，可能登录为false，无须登录即不使用该注解）
     boolean isRequired() default true;
 
-    // 允许角色访问的标志（多个以,分隔）
+    // 允许角色访问的标志（多个以,分隔，和Account配合使用）
     String role() default "";
 
     // 是否自动注入
@@ -28,12 +28,12 @@ public @interface Login {
     int paramIndex() default 0;
 
     // 指明获取参数类型的方式
-    Type getType() default Type.COOKIE;
+    Type getType() default Type.PARAM;
 
     enum Type {
-        HEAD, // 生成token放在请求头
         PARAM, // 通过参数直传userId
-        COOKIE // 生成token放到cookie中
+        HEAD, // 生成token放在请求头，有权限管理（只有异步的后台项目使用）
+        COOKIE // 生成token放到cookie中，无权限管理（同步+异步都有的项目使用）
     }
 
 }
