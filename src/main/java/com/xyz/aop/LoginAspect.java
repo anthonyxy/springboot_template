@@ -50,8 +50,8 @@ public class LoginAspect {
     }
 
     // 配置环绕通知
-    @Around("packet()")
-    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("packet()&&@annotation(login)") // 区分后台aop
+    public Object around(ProceedingJoinPoint joinPoint, Login login) throws Throwable {
 
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
 
@@ -62,7 +62,6 @@ public class LoginAspect {
         }
 
         // 获取注解配置
-        Login login;
         Login masterLogin = methodSignature.getMethod().getAnnotation(Login.class);
         Login slaveLogin = joinPoint.getTarget().getClass().getAnnotation(Login.class);
         // 如果都没有login注解，就不需要检验
