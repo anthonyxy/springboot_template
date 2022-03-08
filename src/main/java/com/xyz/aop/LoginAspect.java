@@ -80,7 +80,7 @@ public class LoginAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
 
-        if (login.getType().equals(Type.PARAMID)) { // 从参数中直接获取（异步）
+        if (login.getType().equals(Type.PARAM)) { // 从参数中直接获取（异步）
             String userId = request.getParameter(login.value());
             if (StrUtil.isEmpty(userId)) {
                 if (login.isRequired()) {
@@ -94,7 +94,7 @@ public class LoginAspect {
                 ResponseUtil.outWithJson(response, DataResult.build9200("userId格式错误"));
                 return null;
             }
-        } else if (login.getType().equals(Type.HEADTOKEN)) { // 从请求头中获取（异步）
+        } else if (login.getType().equals(Type.HEAD)) { // 从请求头中获取（异步）
             String token = request.getHeader(SystemConfig.HEAD_TOKEN);
             if (login.isRequired()) { // token为空但必须登陆
                 if (StrUtil.isEmpty(token)) { // token为空

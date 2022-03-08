@@ -31,8 +31,8 @@ public @interface Login {
     Type getType() default Type.COOKIE;
 
     enum Type {
-        HEADTOKEN, // 生成token放在请求头
-        PARAMID, // 通过参数直传userId
+        HEAD, // 生成token放在请求头
+        PARAM, // 通过参数直传userId
         COOKIE // 生成token放到cookie中
     }
 
