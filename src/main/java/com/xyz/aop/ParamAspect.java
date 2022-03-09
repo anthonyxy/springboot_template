@@ -131,7 +131,7 @@ public class ParamAspect {
             }
             return ParamCheckUtil.isFormatDate(arg, regulation);
         } else if (param.type() == ParamType.EMAIL) {
-            return ParamCheckUtil.isEmall(arg);
+            return ParamCheckUtil.isEmail(arg);
         } else if (param.type() == ParamType.QUALIFIER) {
             return ParamCheckUtil.isInclude(arg, param.rule());
         } else if (param.type() == ParamType.PLAIN) {

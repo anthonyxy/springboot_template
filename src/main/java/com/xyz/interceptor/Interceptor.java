@@ -5,13 +5,13 @@ import cn.hutool.core.util.StrUtil;
 import com.xyz.config.SystemConfig;
 import com.xyz.util.ConstantUtil;
 import com.xyz.util.ResponseUtil;
-import com.xyz.util.SignatureUtil;
 import com.xyz.util.dto.DataResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import sun.security.util.SignatureUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,33 +37,6 @@ public class Interceptor implements HandlerInterceptor {
         // 跳过某些url
         if (url.contains("/file/readFile/")) {
             return true;
-        }
-        // 前端分离的数据安全验证
-        if (SystemConfig.IS_SIGN) {
-            // 来自客户端的请求
-            String sign = request.getParameter(SystemConfig.SIGN_KEY);
-            String timestamp = request.getParameter(SystemConfig.TIMESTAMP_KEY);
-            String nonce = request.getParameter(SystemConfig.NONCE_KEY);
-            if (StrUtil.isEmpty(sign) || StrUtil.isEmpty(timestamp) || StrUtil.isEmpty(nonce)) {
-                ResponseUtil.outWithJson(response, DataResult.build9200("签名参数缺失"));
-                comeOut();
-                return false;
-            }
-            if (SystemConfig.IS_SIGN_PAST) {
-                long nowTime = new Date().getTime();
-                long requestTime = Long.parseLong(timestamp);
-                if (nowTime - requestTime < SystemConfig.SIGN_PAST_TIME * 1000) {
-                    ResponseUtil.outWithJson(response, DataResult.build9200("签名过期"));
-                    comeOut();
-                    return false;
-                }
-            }
-            boolean flag = SignatureUtil.checkSignature(sign, timestamp, nonce);
-            if (!flag) {
-                ResponseUtil.outWithJson(response, DataResult.build9200("签名错误"));
-                comeOut();
-                return false;
-            }
         }
         return true;
     }

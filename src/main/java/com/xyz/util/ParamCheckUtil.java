@@ -18,9 +18,9 @@ public class ParamCheckUtil {
         return ReUtil.isMatch(regex, arg);
     }
 
-    public static boolean isEmall(String emall) {
+    public static boolean isEmail(String email) {
         String regex = "^([a-z0-9A-Z]+[-|_|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$";
-        return ReUtil.isMatch(regex, emall);
+        return ReUtil.isMatch(regex, email);
     }
 
     public static boolean isFormatDate(String dateStr, String regulation) {
