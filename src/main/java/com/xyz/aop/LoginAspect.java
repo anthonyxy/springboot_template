@@ -138,11 +138,20 @@ public class LoginAspect {
 
         } else if (login.getType().equals(Type.COOKIE)) { // 从cookie的Value中获取（同步+异步都有的项目使用）
             String token = null;
-            String cookie = request.getHeader("Cookie");
-            if (StrUtil.isNotBlank(cookie)) {
-                String[] cookieTokens = cookie.split("=");
-                if (cookieTokens.length == 2) {
-                    token = cookieTokens[1];
+            String headerCookie = request.getHeader("Cookie");
+            if (StrUtil.isNotEmpty(headerCookie)) {
+                String[] cookieArray = headerCookie.split("; "); // 获取Cookie
+                String cookie = null;
+                for (String cookieStr : cookieArray) {
+                    if (cookieStr.startsWith("cache")) {
+                        cookie = cookieStr;
+                    }
+                }
+                if (StrUtil.isNotEmpty(cookie)) {
+                    String[] cookieTokens = cookie.split("=");
+                    if (cookieTokens.length == 2) {
+                        token = cookieTokens[1];
+                    }
                 }
             }
             String tokenValue = null;

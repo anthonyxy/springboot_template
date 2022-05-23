@@ -22,7 +22,7 @@ public @interface Param {
     // 自定义二级规则（ParamType为PLAIN时为正则，ParamType为QUALIFIER时为限定值（以,分隔），ParamType为DATE时为时间格式yMd）
     String rule() default "";
 
-    // 发生错误后传给前端的提示语
+    // 发生错误后传给前端的提示语（异步）
     String warn() default "";
 
     // 参数类型
