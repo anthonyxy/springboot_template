@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.xyz.entity.pojo.FileInfo;
 import org.slf4j.Logger;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.xyz.service.FileService;
-import com.xyz.util.AnthonyUtil;
 import com.xyz.util.ResponseUtil;
 import com.xyz.util.dto.DataResult;
 
@@ -29,13 +29,6 @@ import cn.hutool.core.date.DateUtil;
  * `file_data` longblob NULL COMMENT '文件二进制内容',
  * PRIMARY KEY (`file_code`) USING BTREE
  */
-//
-// CREATE TABLE `file_info` (
-// `file_code` varchar(32) NOT NULL COMMENT '文件码',
-// `file_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '文件路径',
-// `file_data` longblob NULL COMMENT '文件二进制内容',
-// PRIMARY KEY (`file_code`) USING BTREE
-// )
 @RestController
 public class FileContorller {
 
@@ -73,13 +66,13 @@ public class FileContorller {
         String fileName = file.getOriginalFilename();
         // 获取文件的后缀名
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
-        StringBuilder newpath = new StringBuilder();
-        newpath.append(DateUtil.format(new Date(), "yyyy-MM-dd"));
-        newpath.append("/");
-        newpath.append(System.currentTimeMillis());
-        newpath.append(AnthonyUtil.random(8));
-        newpath.append(suffixName);
-        File newFile = new File(FILE_PATH + newpath);
+        StringBuilder newPath = new StringBuilder();
+        newPath.append(DateUtil.format(new Date(), "yyyy-MM-dd"));
+        newPath.append("/");
+        newPath.append(System.currentTimeMillis());
+        newPath.append(RandomUtil.randomInt(10000000, 100000000));
+        newPath.append(suffixName);
+        File newFile = new File(FILE_PATH + newPath);
         // 检测是否存在目录
         if (!newFile.getParentFile().exists()) {
             newFile.getParentFile().mkdirs();
@@ -90,7 +83,7 @@ public class FileContorller {
             // 获取二进制数据
             byte[] bytes = FileContorller.FileToByte(newFile);
             // 保存路径到数据库
-            return fileService.saveFile(newpath.toString(), bytes);
+            return fileService.saveFile(newPath.toString(), bytes);
         } catch (Exception e) {
             e.printStackTrace();
             return DataResult.build9500();
